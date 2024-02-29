@@ -113,7 +113,14 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
 
+        for (int i = 0; i < board.size(); i ++) {
+            if (tiltColumn(i)) {
+                changed = true;
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
@@ -121,6 +128,42 @@ public class Model extends Observable {
         return changed;
     }
 
+    public boolean tiltColumn(int col) { //if board is changed, return true.
+        //iterate from row3 down
+        boolean flag = false;
+        boolean[] isMerged = new boolean[board.size()];
+        for (int row = board.size() - 2; row >= 0; row --) {
+            //Find the up tile which is not empty. Return the row number.
+            int pos = findTile(col, row);
+            Tile t = board.tile(col, row);
+            if (t == null) continue;
+            if (board.tile(col, pos) == null) {
+                board.move(col, pos, t);
+                flag = true;
+            } else if (isMerged[pos]) {
+                board.move(col, pos - 1, t);
+                if (pos - 1 != row) flag = true;
+            } else if (t.value() == board.tile(col, pos).value()) {
+                score += 2 * t.value();
+                board.move(col, pos, t);
+                isMerged[pos] = true;
+                flag = true;
+            } else {
+                board.move(col, pos - 1, t);
+                if (pos - 1 != row) flag = true;
+            }
+        }
+        return flag;
+    }
+
+    public int findTile(int col, int row) {
+        for (int i = row + 1; i < board.size(); i ++) {
+            if (board.tile(col, i) != null) {
+                return i;
+            }
+        }
+        return board.size() - 1;
+    }
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
@@ -138,6 +181,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i ++){
+            for (int j = 0; j < b.size(); j ++) {
+                Tile tmp = b.tile(i, j);
+                if (tmp == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +199,16 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i ++) {
+            for (int j = 0; j < b.size(); j ++) {
+                Tile tmp = b.tile(i, j);
+                if (tmp == null) {
+                    continue;
+                } else if (tmp.value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +220,32 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        boolean flag = false;
+        int[] x = {0, 0, 1, -1};
+        int[] y = {1, -1, 0, 0};
+        for (int i = 0; i < b.size(); i ++) {
+            for (int j = 0; j < b.size(); j ++) {
+                if (b.tile(i, j) == null) {
+                    flag = true;
+                    continue;
+                }
+                int value = b.tile(i, j).value();
+                for (int k = 0; k <= 3; k ++) {
+                    int adjacentX = i + x[k];
+                    int adjacentY = j + y[k];
+                    if (adjacentX < 0 | adjacentX >= b.size() | adjacentY < 0 | adjacentY >= b.size()) {
+                        continue;
+                    } else if (b.tile(adjacentX, adjacentY) == null) {
+                        continue;
+                    } else if (value == b.tile(adjacentX, adjacentY).value()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        if (flag == true) {
+            return true;
+        }
         return false;
     }
 
