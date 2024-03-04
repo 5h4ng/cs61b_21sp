@@ -64,4 +64,45 @@ public  class ArrayDequeTest {
         assertEquals(Integer.valueOf(2), deque.get(1));
         assertEquals(Integer.valueOf(3), deque.get(2));
     }
+    @Test
+    public void testAddAndGet() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        for (int i = 0; i < 8; i++) {
+            deque.addLast(i);
+        }
+
+    }
+
+    @Test
+    public void testRemoveFromEmptyDeque() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        assertNull(deque.removeFirst());
+        assertNull(deque.removeLast());
+    }
+
+    @Test
+    public void testFillUpEmptyFillUpAgain() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        for (int i = 0; i < 9; i++) {
+            deque.addLast(i);
+        }
+        for (int i = 0; i < 9; i++) {
+            deque.removeFirst();
+        }
+        for (int i = 0; i < 20; i++) {
+            deque.addLast(i);
+        }
+        assertEquals(Integer.valueOf(7), deque.get(7));
+        assertEquals(Integer.valueOf(0), deque.get(0));
+
+
+    }
+
+    @Test
+    public void testNegativeSize() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        deque.removeFirst();
+        deque.removeLast();
+        assertTrue(deque.size() >= 0);
+    }
 }

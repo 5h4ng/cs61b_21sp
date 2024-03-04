@@ -77,11 +77,10 @@ public class ArrayDeque<T> {
     }
 
     public T removeFirst() {
+        if (size == 0) return null;
         int p = nextFirst + 1;
+        if (p == items.length) p = 0;
         T item = items[p];
-        if (p == items.length) {
-            p = 0;
-        }
         items[p] = null;
         nextFirst = p;
         size -= 1;
@@ -89,11 +88,12 @@ public class ArrayDeque<T> {
     }
 
     public T removeLast() {
+        if (size == 0) return null;
         int p = nextLast - 1;
-        T item = items[p];
         if (p < 0) {
             p = items.length - 1;
         }
+        T item = items[p];
         items[p] = null;
         nextLast = p;
         size -= 1;
@@ -102,6 +102,9 @@ public class ArrayDeque<T> {
 
     public T get(int index) {
         int p = nextFirst + 1;
+        if (p == items.length) {
+            p = 0;
+        }
         for (int i = 0; i < index; i ++) {
             if (p == items.length) {
                 p = 0;
