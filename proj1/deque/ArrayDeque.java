@@ -101,6 +101,9 @@ public class ArrayDeque<T> {
     }
 
     public T get(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
         int p = nextFirst + 1;
         if (p == items.length) {
             p = 0;
