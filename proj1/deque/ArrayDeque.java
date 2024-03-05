@@ -30,8 +30,8 @@ public class ArrayDeque<T> {
         if (size == items.length) {
             resize();
         }
-        nextFirst = (nextFirst - 1 + items.length) % items.length;
         items[nextFirst] = item;
+        nextFirst = (nextFirst - 1 + items.length) % items.length;
         size++;
     }
 

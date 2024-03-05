@@ -1,4 +1,5 @@
 import deque.ArrayDeque;
+import jh61b.junit.In;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 
@@ -27,6 +28,15 @@ public  class ArrayDequeTest {
         System.out.println("Printing out deque: ");
         lld1.printDeque();
     }
+    @Test
+    public void addFirstTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        for (int i = 0; i < 20; i ++) {
+            lld1.addFirst(i);
+            assertEquals(Integer.valueOf(i), lld1.get(0));
+        }
+    }
+
 
     @Test
     public void resizeTest() {
@@ -78,24 +88,34 @@ public  class ArrayDequeTest {
         ArrayDeque<Integer> deque = new ArrayDeque<>();
         assertNull(deque.removeFirst());
         assertNull(deque.removeLast());
+        deque.addLast(1);
+        assertEquals(Integer.valueOf(1), deque.removeFirst());
+
     }
 
     @Test
     public void testFillUpEmptyFillUpAgain() {
         ArrayDeque<Integer> deque = new ArrayDeque<>();
-        for (int i = 0; i < 9; i++) {
+        // 填满队列
+        for(int i = 0; i < 8; i++) {
             deque.addLast(i);
         }
-        for (int i = 0; i < 9; i++) {
-            deque.removeFirst();
-        }
-        for (int i = 0; i < 20; i++) {
-            deque.addLast(i);
-        }
-        assertEquals(Integer.valueOf(7), deque.get(7));
-        assertEquals(Integer.valueOf(0), deque.get(0));
 
+        // 清空队列
+        for(int i = 0; i < 8; i++) {
+            assertEquals(Integer.valueOf(i), deque.removeFirst());
+        }
 
+        // 再次填满队列
+        for(int i = 0; i < 8; i++) {
+            deque.addLast(i + 10); // 使用不同的值以便区分
+        }
+
+        // 再次清空队列并检查值
+        for(int i = 0; i < 8; i++) {
+            Integer removed = deque.removeFirst();
+            assertEquals(Integer.valueOf(i + 10), removed);
+        }
     }
 
     @Test
