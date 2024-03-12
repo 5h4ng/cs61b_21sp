@@ -1,6 +1,5 @@
 package deque;
 
-import afu.org.checkerframework.checker.igj.qual.I;
 
 import java.util.Iterator;
 
@@ -123,7 +122,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         if (((ArrayDeque<?>) o).size() != this.size()) {
             return false;
         }
-        for (int i = 0; i < this.size(); i ++) {
+        for (int i = 0; i < this.size(); i++) {
             if (this.get(i) != ((ArrayDeque<?>) o).get(i)) {
                 return false;
             }
