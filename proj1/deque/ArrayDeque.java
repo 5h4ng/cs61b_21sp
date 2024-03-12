@@ -17,14 +17,13 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
         nextFirst = 4;
         nextLast = 5;
     }
-    public void resize() {
-        T[] newItems = (T[]) new Object[items.length * 2];
-        int start = (nextFirst + 1) % items.length;
+    private void resize() {
+        T[] newItems = (T[]) new Object[size() * 2];
         for (int i = 0; i < size; i++) {
-            newItems[i] = items[(start + i) % items.length];
+            newItems[i] = get(i);
         }
         items = newItems;
-        nextFirst = items.length - 1;
+        nextFirst = newItems.length - 1;
         nextLast = size;
     }
 
@@ -105,7 +104,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     private class ArrayDequeIterator implements Iterator<T> {
         private int pos;
-        public ArrayDequeIterator() {
+        ArrayDequeIterator() {
             pos = 0;
         }
         @Override
@@ -136,7 +135,7 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
             return false;
         }
         for (int i = 0; i < this.size(); i++) {
-            if (this.get(i) != ((Deque<?>) o).get(i)) {
+            if (!this.get(i).equals(((Deque<?>) o).get(i))) {
                 return false;
             }
         }

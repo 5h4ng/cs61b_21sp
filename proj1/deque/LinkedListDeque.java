@@ -3,10 +3,10 @@ import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class Node {
-        public T item;
-        public Node prev;
-        public Node next;
-        public Node(T i, Node p, Node n) {
+        private T item;
+        private Node prev;
+        private Node next;
+        Node(T i, Node p, Node n) {
             item = i;
             prev = p;
             next = n;

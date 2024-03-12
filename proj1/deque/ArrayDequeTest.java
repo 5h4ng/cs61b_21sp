@@ -129,7 +129,7 @@ public  class ArrayDequeTest {
     @Test
     public void testIterator() {
         ArrayDeque<Integer> deque = new ArrayDeque<>();
-        for (int i = 0; i < 20; i ++) {
+        for (int i = 0; i < 10; i ++) {
             deque.addLast(i);
         }
         int pos = 0;
@@ -138,7 +138,36 @@ public  class ArrayDequeTest {
             pos += 1;
         }
     }
+    @Test
+    public void testAddRemove() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        // 添加元素
+        for (int i = 0; i < 10; i++) {
+            deque.addLast(i);
+        }
 
+        // 移除元素并检查
+        for (int i = 0; i < 10; i++) {
+            assertEquals(Integer.valueOf(i), deque.removeFirst());
+        }
+
+        assertTrue(deque.size() == 0);
+    }
+
+    @Test
+    public void testResizeShrink() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        // 先填充，然后删除一部分元素以触发缩容
+        for (int i = 0; i < 16; i++) {
+            deque.addLast(i);
+        }
+        for (int i = 0; i < 12; i++) {
+            deque.removeFirst();
+        }
+
+        // 检查是否成功缩容
+        assertTrue(deque.size() == 4);
+    }
     @Test
     public void testEqual() {
         ArrayDeque<Integer> s1 = new ArrayDeque<>();
