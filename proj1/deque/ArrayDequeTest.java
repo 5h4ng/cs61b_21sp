@@ -1,9 +1,7 @@
+package deque;
 import deque.ArrayDeque;
-import jh61b.junit.In;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.Test;
 
-import java.util.Iterator;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -145,6 +143,9 @@ public  class ArrayDequeTest {
     public void testEqual() {
         ArrayDeque<Integer> s1 = new ArrayDeque<>();
         ArrayDeque<Integer> s2 = new ArrayDeque<>();
+        LinkedListDeque<Integer> l1 = new LinkedListDeque<>();
+        l1.addLast(1);
+        l1.addFirst(2);
         s1.addLast(1);
         s1.addFirst(2);
         s2.addLast(1);
@@ -152,6 +153,8 @@ public  class ArrayDequeTest {
         assertTrue(s1.equals(s2));
         s2.removeLast();
         assertFalse(s2.equals(s1));
+        assertTrue(l1.equals(s1));
+        assertTrue(s1.equals(l1));
 
     }
 }

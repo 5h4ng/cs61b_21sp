@@ -1,11 +1,8 @@
 package deque;
-
-import afu.org.checkerframework.checker.oigj.qual.O;
-
 import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
-    public class Node {
+    private class Node {
         public T item;
         public Node prev;
         public Node next;
@@ -19,8 +16,8 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private Node sentinel = new Node(null, null, null);
     /*Create an empty linked list deque.*/
     public LinkedListDeque() {
-       sentinel.next = sentinel;
-       sentinel.prev = sentinel;
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
     }
 
     /*Adds an item of type T to the front of the deque.
@@ -97,7 +94,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
     private class LinkedListDequeIterator implements Iterator<T> {
         private int pos;
-        public LinkedListDequeIterator() {
+        LinkedListDequeIterator() {
             pos = 0;
         }
         @Override
@@ -120,14 +117,17 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof  LinkedListDeque)) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof  Deque)) {
             return false;
         }
-        if (((LinkedListDeque<?>) o).size() != this.size()) {
+        if (((Deque<?>) o).size() != this.size()) {
             return false;
         }
-        for (int i = 0; i < this.size(); i ++) {
-            if (this.get(i) != ((LinkedListDeque<?>) o).get(i)) {
+        for (int i = 0; i < this.size(); i++) {
+            if (this.get(i) != ((Deque<?>) o).get(i)) {
                 return false;
             }
         }
