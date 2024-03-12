@@ -3,6 +3,8 @@ import jh61b.junit.In;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 public  class ArrayDequeTest {
@@ -124,5 +126,32 @@ public  class ArrayDequeTest {
         deque.removeFirst();
         deque.removeLast();
         assertTrue(deque.size() >= 0);
+    }
+
+    @Test
+    public void testIterator() {
+        ArrayDeque<Integer> deque = new ArrayDeque<>();
+        for (int i = 0; i < 20; i ++) {
+            deque.addLast(i);
+        }
+        int pos = 0;
+        for (int elem : deque) {
+            assertEquals((long) elem, (long) deque.get(pos));
+            pos += 1;
+        }
+    }
+
+    @Test
+    public void testEqual() {
+        ArrayDeque<Integer> s1 = new ArrayDeque<>();
+        ArrayDeque<Integer> s2 = new ArrayDeque<>();
+        s1.addLast(1);
+        s1.addFirst(2);
+        s2.addLast(1);
+        s2.addFirst(2);
+        assertTrue(s1.equals(s2));
+        s2.removeLast();
+        assertFalse(s2.equals(s1));
+
     }
 }
