@@ -10,15 +10,45 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
+        if (args.length == 0) {
+            System.out.println("Please enter a command.");
+            System.exit(0);
+        }
+        Repository repo = new Repository();
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
                 // TODO: handle the `init` command
+                repo.init();
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
                 break;
             // TODO: FILL THE REST IN
+            case "commit":
+
+                break;
+            case "rm":
+                break;
+            case "log":
+                break;
+            case "global-log":
+                break;
+            case "find":
+                break;
+            case "status":
+                break;
+            case "checkout":
+                break;
+            case "branch":
+                break;
+            case "rm-branch":
+                break;
+            case "reset":
+                break;
+            case "merge":
+                break;
+
         }
     }
 }
