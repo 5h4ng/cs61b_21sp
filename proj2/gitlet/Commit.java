@@ -25,15 +25,15 @@ public class Commit implements Serializable {
     private final String message;
     private final Date currentTime;
     private final String timeStamp;
-    private final Commit parent;
-    private final Commit secondParent;
+    private final String parentId;
+    private final String secondParentId;
     private final TreeMap<String, String> fileBlobs;
 
-    public Commit(String message, Date currentTime, Commit parent, Commit secondParent, TreeMap<String, String> fileBlobs) {
+    public Commit(String message, Date currentTime, String parentId, String secondParentId, TreeMap<String, String> fileBlobs) {
         this.message = message;
-        this.parent = parent;
+        this.parentId = parentId;
         this.currentTime = currentTime;
-        this.secondParent = secondParent;
+        this.secondParentId = secondParentId;
         this.fileBlobs = fileBlobs;
         this.timeStamp = dateToTimeStamp(currentTime);
     }
@@ -46,12 +46,12 @@ public class Commit implements Serializable {
         return currentTime;
     }
 
-    public Commit getParent() {
-        return parent;
+    public String getParentId() {
+        return parentId;
     }
 
-    public Commit getSecondParent() {
-        return secondParent;
+    public String getSecondParentId() {
+        return secondParentId;
     }
 
     public TreeMap<String, String> getFileBlobs() {
@@ -62,7 +62,13 @@ public class Commit implements Serializable {
     }
 
     public String getUID() {
-        return Utils.sha1(message, timeStamp, parent, secondParent, fileBlobs.toString());
+        return Utils.sha1(
+                (message != null) ? message : "",
+                (timeStamp != null) ? timeStamp : "",
+                (parentId != null) ? parentId : "",
+                (secondParentId != null) ? secondParentId : "",
+                (fileBlobs != null) ? fileBlobs.toString() : ""
+        );
     }
     private String dateToTimeStamp(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

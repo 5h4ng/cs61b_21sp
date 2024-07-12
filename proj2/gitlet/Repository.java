@@ -52,7 +52,7 @@ public class Repository {
      *
      * @throws GitletException if the repository already exists or if an error occurs during initialization.
      */
-    public void init() throws IOException {
+    public void init() {
         // Check if the .gitlet directory already exists
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
@@ -69,7 +69,6 @@ public class Repository {
             createFile(ADD_STAGE_FILE);
             createFile(REMOVE_STAGE_FILE);
             createFile(MASTER_FILE);
-            createFile(join(HEADS_DIR, "master"));
 
             // Create initial commit
             Commit initCommit = new Commit("initial commit", new Date(0), null, null, null);
@@ -77,7 +76,7 @@ public class Repository {
         }
     }
 
-    public void saveCommit(Commit commit) throws IOException {
+    public void saveCommit(Commit commit) {
         File commitFile = join(COMMIT_DIR, commit.getUID());
         createFile(commitFile);
         writeObject(commitFile, commit);
@@ -89,10 +88,13 @@ public class Repository {
         }
     }
 
-    private void createFile(File file) throws IOException {
-        if (!file.createNewFile()) {
-            throw new GitletException(file.getName() + " file already exists or could not be created.");
+    private void createFile(File file) {
+        try {
+            if (!file.createNewFile()) {
+                throw new GitletException(file.getName() + " file already exists or could not be created.");
+            }
+        } catch (IOException e) {
+            throw new GitletException("An error occurred while creating " + file.getName() + " file.");
         }
     }
-
 }
