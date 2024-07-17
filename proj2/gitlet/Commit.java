@@ -18,8 +18,8 @@ public class Commit implements Serializable {
     private final String timeStamp;
     private final String parentId;
     private final String secondParentId;
-    private final TreeMap<String, String> fileBlobs;
-    private final String UID;
+    private final TreeMap<String, String> fileBlobs; // filename -> hash
+    private final String id;
 
     public Commit(String message, Date currentTime, String parentId, String secondParentId, TreeMap<String, String> fileBlobs) {
         this.message = message;
@@ -28,7 +28,7 @@ public class Commit implements Serializable {
         this.secondParentId = secondParentId;
         this.fileBlobs = fileBlobs;
         this.timeStamp = dateToTimeStamp(currentTime);
-        this.UID = Utils.sha1(
+        this.id = Utils.sha1(
                 (message != null) ? message : "",
                 timeStamp,
                 (parentId != null) ? parentId : "",
@@ -60,8 +60,8 @@ public class Commit implements Serializable {
         return timeStamp;
     }
 
-    public String getUID() {
-        return UID;
+    public String getId() {
+        return id;
     }
     private String dateToTimeStamp(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
