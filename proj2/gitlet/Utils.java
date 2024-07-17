@@ -111,10 +111,7 @@ class Utils {
         return new String(readContents(file), StandardCharsets.UTF_8);
     }
 
-    /** Write the result of concatenating the bytes in CONTENTS to FILE,
-     *  creating or overwriting it as needed.  Each object in CONTENTS may be
-     *  either a String or a byte array.  Throws IllegalArgumentException
-     *  in case of problems. */
+
     static void writeContents(File file, Object... contents) {
         try {
             if (file.isDirectory()) {

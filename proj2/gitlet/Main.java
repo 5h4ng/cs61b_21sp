@@ -34,14 +34,39 @@ public class Main {
                 }
                 break;
             case "rm":
+                if (args.length != 2) {
+                    System.out.println("Incorrect operands");
+                } else {
+                    repo.rm(args[1]);
+                }
                 break;
             case "log":
+                if (args.length != 1) {
+                    System.out.println("Incorrect operands.");
+                } else {
+                    repo.log();
+                }
                 break;
             case "global-log":
+                if (args.length != 1) {
+                    System.out.println("Incorrect operands");
+                } else {
+                    repo.global_log();
+                }
                 break;
             case "find":
+                if (args.length != 2) {
+                    System.out.println("Incorrect operands");
+                } else {
+                    repo.find(args[1]);
+                }
                 break;
             case "status":
+                if (args.length != 1) {
+                    System.out.println("Incorrect operands");
+                } else {
+                    repo.status();
+                }
                 break;
             case "checkout":
                 break;

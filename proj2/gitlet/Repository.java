@@ -2,9 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -166,6 +164,91 @@ public class Repository {
 
     }
 
+    /**
+     * Unstage the file if it is currently staged for addition.
+     * If the file is tracked in the current commit, stage it for removal and remove the file from the working directory
+     * if the user has not already done so (do not remove it unless it is tracked in the current commit).
+     * @param fileName
+     */
+    public void rm(String fileName) {
+        Commit currentCommit = getCurrentCommit();
+        TreeMap<String, String> addStage = readObject(ADD_STAGE_FILE, Stage.class).getData();
+        TreeMap<String, String> removeStage = readObject(REMOVE_STAGE_FILE, Stage.class).getData();
+        boolean flag = false;
+
+        if (addStage.containsKey(fileName)) {
+            addStage.remove(fileName);
+            writeObject(ADD_STAGE_FILE, addStage);
+            flag = true;
+        }
+
+        if (currentCommit.getFileBlobs().containsKey(fileName)) {
+            removeStage.put(fileName, currentCommit.getFileBlobs().get(fileName));
+            writeObject(REMOVE_STAGE_FILE, removeStage);
+            flag = true;
+            File fileToRemove = join(CWD, fileName);
+            if (fileToRemove.exists()) {
+                restrictedDelete(fileToRemove);
+            }
+        }
+         if(!flag) {
+             System.out.println("No reason to remove the file");
+         }
+
+    }
+
+    public void log() {
+        logHelper(getCurrentCommit());
+    }
+
+    private void logHelper(Commit commit) {
+        if (commit.getParentId() != null) {
+            CommitPrinter(commit);
+            logHelper(getCommit(commit.getParentId()));
+        }
+    }
+
+    public void global_log() {
+        List<String> commitFileNames = plainFilenamesIn(COMMIT_DIR);
+        for (String commitFileName : commitFileNames) {
+            Commit commit = readObject(join(COMMIT_DIR, commitFileName), Commit.class);
+            CommitPrinter(commit);
+        }
+    }
+
+    public void find(String message) {
+        boolean flag = true;
+        List<String> commitFileNames = plainFilenamesIn(COMMIT_DIR);
+        for (String commitFileName : commitFileNames) {
+            Commit commit = readObject(join(COMMIT_DIR, commitFileName), Commit.class);
+            if (commit.getMessage().equals(message)) {
+                System.out.println(commit.getId());
+                flag = false;
+            }
+        }
+        if (flag) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
+    public void status() {
+
+    }
+    private void CommitPrinter(Commit commit) {
+        System.out.println("===");
+        // Print commit SHA-1: "commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48"
+        System.out.println("commit " + commit.getId());
+        // If commit has two parent commits, “Merge:” consist of the first seven digits of the first and second parents’ commit ids, in that order.
+        if (commit.getSecondParentId() != null) {
+            System.out.println("Merge: " + commit.getParentId().substring(0, 6) + " " + commit.getSecondParentId().substring(0, 6));
+        }
+        // Print Data: "Date: Thu Nov 9 17:01:33 2017 -0800"
+        System.out.println("Date: " + commit.getTimeStamp());
+        // Print message
+        System.out.println(commit.getMessage());
+        System.out.println();
+    }
+
     private Commit getCurrentCommit() {
         String HEAD_content = readContentsAsString(HEAD_FILE);
         if (!HEAD_content.startsWith("ref: ")) {
@@ -206,5 +289,9 @@ public class Repository {
         } catch (IOException e) {
             throw new GitletException("An error occurred while creating " + file.getName() + " file.");
         }
+    }
+
+    private Commit getCommit(String id) {
+        return readObject(join(COMMIT_DIR, id), Commit.class);
     }
 }
