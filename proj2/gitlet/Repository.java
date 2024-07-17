@@ -3,7 +3,6 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static gitlet.Utils.*;
 
@@ -46,6 +45,8 @@ public class Repository {
     public static final File ADD_STAGE_FILE = join(GITLET_DIR, "addstage");
     /** The staging area for removed files. */
     public static final File REMOVE_STAGE_FILE = join(GITLET_DIR, "removestage");
+    /** HEAD file pointing to the current branch. */
+    public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
     /**
      * Initializes a new Gitlet repository. Creates the necessary directory
      * structure and initial files.
@@ -69,13 +70,24 @@ public class Repository {
             createFile(ADD_STAGE_FILE);
             createFile(REMOVE_STAGE_FILE);
             createFile(MASTER_FILE);
-
+            createFile(HEAD_FILE);
             // Create initial commit
             Commit initCommit = new Commit("initial commit", new Date(0), null, null, null);
             saveCommit(initCommit);
+            writeContents(HEAD_FILE, "master");
+            writeContents(MASTER_FILE, initCommit.getUID());
         }
     }
 
+    public void add(String fileName) {
+        if (!join(CWD, fileName).exists()) {
+            System.out.println("File does not exist.");
+        } else if (!join(CWD, ".gitlet").exists()){
+            System.out.println("Not in an initialized Gitlet directory.");
+        } else {
+
+        }
+    }
     public void saveCommit(Commit commit) {
         File commitFile = join(COMMIT_DIR, commit.getUID());
         createFile(commitFile);

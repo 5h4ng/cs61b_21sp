@@ -20,6 +20,11 @@ public class Main {
                 repo.init();
                 break;
             case "add":
+                if (args.length != 2) {
+                    System.out.println("Incorrect operands.");
+                } else {
+                    repo.add(args[1]);
+                }
                 break;
             case "commit":
                 break;

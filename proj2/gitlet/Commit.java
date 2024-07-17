@@ -1,19 +1,10 @@
 package gitlet;
 
-// TODO: any imports you need here
-
-import com.sun.source.tree.Tree;
-
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.TreeMap;
-
-import static gitlet.Utils.join;
-import static gitlet.Utils.writeObject;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -28,6 +19,7 @@ public class Commit implements Serializable {
     private final String parentId;
     private final String secondParentId;
     private final TreeMap<String, String> fileBlobs;
+    private final String UID;
 
     public Commit(String message, Date currentTime, String parentId, String secondParentId, TreeMap<String, String> fileBlobs) {
         this.message = message;
@@ -36,6 +28,13 @@ public class Commit implements Serializable {
         this.secondParentId = secondParentId;
         this.fileBlobs = fileBlobs;
         this.timeStamp = dateToTimeStamp(currentTime);
+        this.UID = Utils.sha1(
+                (message != null) ? message : "",
+                timeStamp,
+                (parentId != null) ? parentId : "",
+                (secondParentId != null) ? secondParentId : "",
+                (fileBlobs != null) ? fileBlobs.toString() : ""
+        );
     }
 
     public String getMessage() {
@@ -62,13 +61,7 @@ public class Commit implements Serializable {
     }
 
     public String getUID() {
-        return Utils.sha1(
-                (message != null) ? message : "",
-                (timeStamp != null) ? timeStamp : "",
-                (parentId != null) ? parentId : "",
-                (secondParentId != null) ? secondParentId : "",
-                (fileBlobs != null) ? fileBlobs.toString() : ""
-        );
+        return UID;
     }
     private String dateToTimeStamp(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
