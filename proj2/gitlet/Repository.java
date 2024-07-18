@@ -97,8 +97,6 @@ public class Repository {
             // Read current commit's blobs
             Commit currentCommit = getCurrentCommit();
             TreeMap<String, String> currentBlobs = currentCommit.getFileBlobs();
-            // Read the file content
-            String fileContent = readContentsAsString(fileToAdd);
             // Check if the file is identical to the one in the current commit
             // If the file is identical to the current commit's version, remove it from staging area if present
             // Else, stage it for addition
@@ -329,6 +327,98 @@ public class Repository {
         System.out.println();
     }
 
+    /**
+     * Takes the version of the file as it exists in the head commit and puts it in the working directory,
+     * overwriting the version of the file that’s already there if there is one.
+     * The new version of the file is not staged.
+     * @param fileName
+     */
+    public void checkoutFileInHead(String fileName) {
+        Commit currentCommit = getCurrentCommit();
+        if (!currentCommit.getFileBlobs().containsKey(fileName)) {
+            System.out.println("File does not exist in that commit.");
+        } else {
+            String blobHash = currentCommit.getFileBlobs().get(fileName);
+            Blob blob = readObject(join(BLOB_DIR, blobHash), Blob.class);
+            writeContents(join(CWD, fileName), blob.getContent());
+        }
+    }
+
+    /**
+     * Takes the version of the file as it exists in the commit with the given id,
+     * and puts it in the working directory, overwriting the version of the file that’s already there if there is one.
+     * The new version of the file is not staged.
+     * @param fileName
+     */
+    public void checkoutFileInCommit(String commitId, String fileName) {
+        List<String> commitIdList = plainFilenamesIn(COMMIT_DIR);
+        if (!commitIdList.contains(commitId)) {
+            System.out.println("No commit with that id exists.");
+        } else {
+            Commit commit = getCommit(commitId);
+            if (!commit.getFileBlobs().containsKey(fileName)) {
+                System.out.println("File does not exist in that commit.");
+                return;
+            }
+            String blobHash = commit.getFileBlobs().get(fileName);
+            Blob blob = readObject(join(CWD, blobHash), Blob.class);
+            writeContents(join(CWD, fileName), blob.getContent());
+        }
+    }
+
+    /**
+     * Takes all files in the commit at the head of the given branch, and puts them in the working directory,
+     * overwriting the versions of the files that are already there if they exist.
+     * Also, at the end of this command, the given branch will now be considered the current branch (HEAD).
+     * Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.
+     * The staging area is cleared, unless the checked-out branch is the current branch (see Failure cases below).
+     * @param branchName
+     */
+    public void checkoutBranch(String branchName) {
+        List<String> branchIdList = plainFilenamesIn(HEADS_DIR);
+        if (!branchIdList.contains(branchName)) {
+            System.out.println("No such branch exists.");
+        } else {
+            String currentBranchName = readContentsAsString(HEAD_FILE).substring(5);
+            if (currentBranchName.equals(branchName)) {
+                System.out.println("No need to checkout the current branch.");
+                return;
+            }
+
+            Commit currentCommit = getCurrentCommit();
+            List<String> cwdFiles = plainFilenamesIn(CWD);
+            TreeMap<String, String> currentBlobs = currentCommit.getFileBlobs();
+            Stage addStage = readObject(ADD_STAGE_FILE, Stage.class);
+            Stage removeStage = readObject(REMOVE_STAGE_FILE, Stage.class);
+            for (String fileName : cwdFiles) {
+                if (!currentBlobs.containsKey(fileName) && !addStage.getData().containsKey(fileName) && !removeStage.getData().containsKey(fileName)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    return;
+                }
+            }
+
+            String commitId = readContentsAsString(join(HEADS_DIR, branchName));
+            Commit branchCommit = getCommit(commitId);
+            TreeMap<String, String> branchBlobs = branchCommit.getFileBlobs();
+
+            for (String fileName : cwdFiles) {
+                if (!branchBlobs.containsKey(fileName)) {
+                    restrictedDelete(join(CWD, fileName));
+                }
+            }
+
+            for (String fileName : branchBlobs.keySet()) {
+                String blobHash = branchBlobs.get(fileName);
+                Blob blob = readObject(join(BLOB_DIR, blobHash), Blob.class);
+                writeContents(join(CWD, fileName), blob.getContent());
+            }
+
+            writeContents(HEAD_FILE, "ref: " + branchName);
+            writeContents(ADD_STAGE_FILE, new Stage());
+            writeContents(REMOVE_STAGE_FILE, new Stage());
+        }
+
+    }
 
     private void CommitPrinter(Commit commit) {
         System.out.println("===");

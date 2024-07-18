@@ -69,6 +69,22 @@ public class Main {
                 }
                 break;
             case "checkout":
+                if (args.length == 3 && args[1].equals("--")) {
+                    // java gitlet.Main checkout -- [file name]
+                    String fileName = args[2];
+                    repo.checkoutFileInHead(fileName);
+                } else if (args.length == 4 && args[2].equals("--")) {
+                    // java gitlet.Main checkout [commit id] -- [file name]
+                    String commitId = args[1];
+                    String fileName = args[3];
+                    repo.checkoutFileInCommit(commitId, fileName);
+                } else if (args.length == 2) {
+                    // java gitlet.Main checkout [branch name]
+                    String branchName = args[1];
+                    repo.checkoutBranch(branchName);
+                } else {
+                    System.out.println("Incorrect operands.");
+                }
                 break;
             case "branch":
                 break;
