@@ -232,8 +232,104 @@ public class Repository {
     }
 
     public void status() {
+        // Display branches
+        System.out.println("=== Branches ===");
+        List<String> branchNames = plainFilenamesIn(HEADS_DIR);
+        Collections.sort(branchNames); // Sort branch names in lexicographical order
+        String headContent = readContentsAsString(HEAD_FILE);
+        String currentBranchName;
+        if (headContent.startsWith("ref: ")) {
+            currentBranchName = headContent.substring(5);
+        } else {
+            // TODO: Handle detached HEAD
+            return;
+        }
+        for (String branchName : branchNames) {
+            if (branchName.equals(currentBranchName)) {
+                System.out.print("*");
+            }
+            System.out.println(branchName);
+        }
+        System.out.println();
 
+        // Display staged files
+        System.out.println("=== Staged Files ===");
+        Stage addStage = readObject(ADD_STAGE_FILE, Stage.class);
+        List<String> stagedFiles = new ArrayList<>(addStage.getData().keySet());
+        Collections.sort(stagedFiles); // Sort staged files
+        for (String fileName : stagedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+
+        // Display removed files
+        System.out.println("=== Removed Files ===");
+        Stage removeStage = readObject(REMOVE_STAGE_FILE, Stage.class);
+        List<String> removedFiles = new ArrayList<>(removeStage.getData().keySet());
+        Collections.sort(removedFiles); // Sort removed files
+        for (String fileName : removedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+
+        // Display modifications not staged for commit
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        List<String> cwdFiles = plainFilenamesIn(CWD);
+        Collections.sort(cwdFiles); // Sort current working directory files
+        TreeMap<String, String> currentBlobs = getCurrentCommit().getFileBlobs();
+        Set<String> modifications = new TreeSet<>(); // Use TreeSet to store modifications sorted
+
+        for (String fileName : cwdFiles) {
+            File file = join(CWD, fileName);
+            if (currentBlobs.containsKey(fileName)) {
+                String blobId = currentBlobs.get(fileName);
+                Blob currentBlob = readObject(join(BLOB_DIR, blobId), Blob.class);
+                String currentContent = readContentsAsString(file);
+                if (!currentBlob.getContent().equals(currentContent)) {
+                    modifications.add(fileName + " (modified)");
+                }
+            } else if (addStage.getData().containsKey(fileName)) {
+                String stagedBlobId = addStage.getData().get(fileName);
+                Blob stagedBlob = readObject(join(BLOB_DIR, stagedBlobId), Blob.class);
+                String currentContent = readContentsAsString(file);
+                if (!stagedBlob.getContent().equals(currentContent)) {
+                    modifications.add(fileName + " (modified)");
+                }
+            }
+        }
+        for (String fileName : currentBlobs.keySet()) {
+            if (!cwdFiles.contains(fileName) && !removeStage.getData().containsKey(fileName)) {
+                modifications.add(fileName + " (deleted)");
+            }
+        }
+        for (String fileName : addStage.getData().keySet()) {
+            if (!cwdFiles.contains(fileName)) {
+                modifications.add(fileName + " (deleted)");
+            }
+        }
+
+        for (String modification : modifications) {
+            System.out.println(modification);
+        }
+        System.out.println();
+
+        // Display untracked files
+        System.out.println("=== Untracked Files ===");
+        Set<String> untrackedFiles = new TreeSet<>(); // Use TreeSet to store untracked files sorted
+        for (String fileName : cwdFiles) {
+            if (!currentBlobs.containsKey(fileName) && !addStage.getData().containsKey(fileName)) {
+                untrackedFiles.add(fileName);
+            }
+        }
+
+        for (String fileName : untrackedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+        System.out.println();
     }
+
+
     private void CommitPrinter(Commit commit) {
         System.out.println("===");
         // Print commit SHA-1: "commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48"
